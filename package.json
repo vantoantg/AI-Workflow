@@ -1,0 +1,19 @@
+{
+  "name": "kl-wfl-cli",
+  "version": "1.0.0",
+  "description": "CLI sync WFL agents, commands, and skills to .claude directory",
+  "main": "bin/index.js",
+  "bin": {
+    "kl-wfl": "bin/index.js"
+  },
+  "files": [
+    "bin",
+    "agents",
+    "commands",
+    "skills",
+    "templates"
+  ],
+  "engines": {
+    "node": ">=22.22.3"
+  }
+}
