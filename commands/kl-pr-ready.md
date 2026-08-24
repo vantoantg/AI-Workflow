@@ -39,7 +39,8 @@ main session (this command)
 1. **Resolve ticket ID** — scan the user's message for `[A-Z]+-[0-9]+`. If not found, read `.kl/current.json` and use the `ticket` field. If still not found, ask the user to provide the ticket ID.
 2. Run `git status`. Flag any accidental unrelated changes, secrets, debug logs, or temp files.
 3. Run `git diff develop...HEAD --stat`. Show the human a summary of changed files.
-4. Check if `.kl/workflow/TICKET-ID.json` exists. If not, create it:
+4. If a `.kl/specs/TICKET-ID-*/test-cases.md` file exists, use it as the primary verification checklist. If not, continue with changed-file-based verification.
+5. Check if `.kl/workflow/TICKET-ID.json` exists. If not, create it:
    ```json
    {
      "ticket": "TICKET-ID",

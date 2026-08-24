@@ -7,7 +7,7 @@ argument-hint: "MNOPVS-1234"
 # KL PR Description
 
 ## Overview
-Generate a standardized pull request body file at `.kl/.pr/TICKET-ID.md` from the approved spec and workflow state. Called as part of `/kl-dev-ticket` Phase 7 or `/kl-pr-ready`.
+Generate a standardized pull request body file at `.kl/pr/TICKET-ID.md` from the approved spec and workflow state. Called as part of `/kl-dev-ticket` Phase 7 or `/kl-pr-ready`.
 
 ## Process
 
@@ -16,12 +16,13 @@ Generate a standardized pull request body file at `.kl/.pr/TICKET-ID.md` from th
 Read all of:
 - `.kl/specs/TICKET-ID-Slug/spec.md` — acceptance criteria, risks
 - `.kl/specs/TICKET-ID-Slug/plan.md` — solution approach
+- `.kl/specs/TICKET-ID-Slug/test-cases.md` — planned, passed, and skipped test cases
 - `.kl/workflow/TICKET-ID.json` — tests run, retry events, approval state
 - `git diff develop...HEAD` — summarize actual changes
 
-### Step 2 — Write `.kl/.pr/TICKET-ID.md`
+### Step 2 — Write `.kl/pr/TICKET-ID.md`
 
-Create `.kl/.pr/` if it does not exist.
+Create `.kl/pr/` if it does not exist.
 
 Use the template below. Fill every section from the source artifacts — do not leave placeholder text.
 
@@ -52,6 +53,12 @@ Implements [TICKET-ID](https://keyloop.atlassian.net/browse/TICKET-ID).
 - [x] `<command>` — passed
 - [ ] `<command>` — not run, reason: <why>
 
+## Test Cases
+
+<!-- Summarize test-cases.md. Required cases should be Passed or explicitly Skipped with a reason. -->
+- [x] `TC-1.1` / `AC-1` — passed via `<command>`
+- [ ] `TC-1.2` / `AC-1` — skipped, reason: <why>
+
 ## Risks
 
 | Risk | Severity | Mitigation |
@@ -72,6 +79,7 @@ Implements [TICKET-ID](https://keyloop.atlassian.net/browse/TICKET-ID).
 
 - Only mark an acceptance criterion `[x]` if the implementation actually satisfies it and tests confirm it.
 - Only mark a test command `[x]` if it was run and passed during this workflow — the `testsRun` array in the state file is the source of truth.
+- Only mark a test case `[x]` if its `test-cases.md` status is `Passed`. If it is `Skipped`, include the reason.
 - If `retryCount.implementation > 0` in the state file, document the retry events under Notes for Reviewers.
 - Do not invent risks. Use only what the spec and self-review findings surfaced.
 
@@ -79,7 +87,7 @@ Implements [TICKET-ID](https://keyloop.atlassian.net/browse/TICKET-ID).
 
 After writing the file:
 ```
-PR body written → .kl/.pr/TICKET-ID.md
+PR body written → .kl/pr/TICKET-ID.md
 ```
 
 The file is ready for human review before the PR is created.

@@ -1,13 +1,13 @@
 ---
 name: kl-implement-spec
-description: Use when the user wants to implement a Jira ticket that already has an approved spec artifact folder in .kl/specs/. Reads spec.md/plan.md/tasks.md, follows the implementation checklist in tasks.md, applies TDD, tracks retry attempts, and updates the workflow state file as it goes.
+description: Use when the user wants to implement a Jira ticket that already has an approved spec artifact folder in .kl/specs/. Reads spec.md/plan.md/test-cases.md/tasks.md, follows the implementation checklist in tasks.md, applies TDD from test-cases.md, tracks retry attempts, and updates the workflow state file as it goes.
 argument-hint: "MNOPVS-1234"
 ---
 
 # KL Implement Spec
 
 ## Overview
-Read the `.kl/specs/TICKET-ID-Slug/` artifact folder produced and approved via `kl-ticket-spec`, then execute the implementation end-to-end: source changes, tests first (TDD), lint, coverage check, and state file updates at every phase boundary.
+Read the `.kl/specs/TICKET-ID-Slug/` artifact folder produced and approved via `kl-ticket-spec`, then execute the implementation end-to-end: source changes, tests first (TDD) from `test-cases.md`, lint, coverage check, and state file updates at every phase boundary.
 
 ## Process
 
@@ -18,7 +18,7 @@ Given a ticket ID (e.g. `MNOPVS-1234`), find the matching spec folder:
 find .kl/specs -type d -name "MNOPVS-1234-*" | head -1
 ```
 
-Read `spec.md`, `research.md` (if present), `plan.md`, and `tasks.md` in full. If no spec folder exists, stop and tell the user to run `/kl-ticket-spec TICKET-ID` first.
+Read `spec.md`, `research.md` (if present), `plan.md`, `test-cases.md`, and `tasks.md` in full. If no spec folder exists, stop and tell the user to run `/kl-ticket-spec TICKET-ID` first. If `test-cases.md` is missing, stop and ask the user to regenerate or update the spec artifacts before implementation.
 
 ### Step 2 — Load the workflow state file
 Read `.kl/workflow/TICKET-ID.json`. It tells you:
@@ -37,6 +37,7 @@ If the state file does not exist, create it now:
   "artifacts": {
     "spec": ".kl/specs/TICKET-ID-Slug/spec.md",
     "plan": ".kl/specs/TICKET-ID-Slug/plan.md",
+    "testCases": ".kl/specs/TICKET-ID-Slug/test-cases.md",
     "tasks": ".kl/specs/TICKET-ID-Slug/tasks.md"
   },
   "branch": "<current branch>",
@@ -48,7 +49,7 @@ If the state file does not exist, create it now:
 ```
 
 ### Step 3 — Load context
-Before touching any code, read every file listed in the **Codebase Context** section of `spec.md` and the **Affected Files/Modules** section of `plan.md`. Understand current behaviour fully before proposing changes.
+Before touching any code, read every file listed in the **Codebase Context** section of `spec.md` and the **Affected Files/Modules** section of `plan.md`. Use `test-cases.md` to identify required test files, concrete scenarios, expected assertions, and verification commands. Understand current behaviour fully before proposing changes.
 
 Also read the relevant test files so you know what already exists.
 
@@ -67,9 +68,9 @@ If yes → **stop** and present the risk to the human before continuing. Record 
 
 ### Step 5 — Implement using TDD
 
-Follow the checklist in `tasks.md`, in order. For every source change:
+Follow the checklist in `tasks.md`, in order, and use `test-cases.md` as the required test contract. For every source change:
 
-1. **Write the test first** — unit test in `test/unit/`, functional test in `test/functional/`
+1. **Write the test first** — implement the matching TC-N.N scenario from `test-cases.md`
 2. **Watch it fail** — run the specific test file to confirm RED
 3. **Write minimal source code** to make it pass (GREEN)
 4. **Run the full test suite** to catch regressions
@@ -97,7 +98,7 @@ When a test fails, determine the root cause before retrying:
 **Retry cap:** If `retryCount.implementation` reaches **3**, stop immediately. Do not attempt further fixes. Present the structured blocker (see Blocker Format below) to the human and wait for guidance.
 
 ### Step 7 — Tick off checklist items
-As each checklist item is completed, update `tasks.md`: change `- [ ]` to `- [x]` for that item only after its tests/code pass.
+As each checklist item is completed, update `tasks.md`: change `- [ ]` to `- [x]` for that item only after its tests/code pass. When a TC-N.N verification command passes, update the matching row in `test-cases.md` to `Passed`. If a planned test case is intentionally not implemented, mark it `Skipped` and include a clear reason in its Notes.
 
 ### Step 8 — Final verification
 After all checklist items are done, run the full verification sequence:
@@ -113,13 +114,14 @@ npm run compile-docs   # Regenerate src/docs/schema.ts
 npm run spectral-lint  # Validate against NetDirector standards
 ```
 
-Record every command and its result in `testsRun` in the state file. Update `status` to `"implementation-complete"`.
+Record every command and its result in `testsRun` in the state file. Before finishing, verify every required test case in `test-cases.md` is `Passed` or `Skipped` with a reason. Update `status` to `"implementation-complete"`.
 
 ### Step 9 — Report completion
 Summarise:
 - What was implemented
 - Any deviations from the spec (and why)
 - Retry events that occurred (`retryCount.implementation`)
+- Test cases completed, passed, or skipped with reasons
 - Checklist items that remain open (if any), with reason
 
 ---

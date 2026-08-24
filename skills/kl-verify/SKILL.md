@@ -7,7 +7,20 @@ argument-hint: "MNOPVS-1234 [optional: unit|functional|full]"
 # KL Test Verification
 
 ## Overview
-Standardize how the AI selects, runs, and records verification commands in this repository. The state file `testsRun` array is the single source of truth — only commands actually run and their real results are recorded there.
+Standardize how the AI selects, runs, and records verification commands in this repository. `test-cases.md` is the source of truth for required scenario-level checks, and the state file `testsRun` array is the source of truth for commands actually run and their real results.
+
+## Test Case Driven Verification
+
+Before choosing commands, read `.kl/specs/TICKET-ID-Slug/test-cases.md` when it exists.
+
+For every required test case:
+1. Confirm the target test file exists or was created during implementation.
+2. Run the listed `Verification Command`, or the closest project-correct equivalent if the command is stale.
+3. Record the command result in `.kl/workflow/TICKET-ID.json`.
+4. Mark the test case `Passed` in `test-cases.md` only if the command passed and the test case is covered by that command.
+5. If a required test case cannot be run, leave it as `Planned` or mark it `Skipped` only with a reason.
+
+Do not mark a verification task in `tasks.md` as done until the corresponding TC-N.N row in `test-cases.md` is `Passed` or explicitly `Skipped` with a reason.
 
 ## Selection Rules
 

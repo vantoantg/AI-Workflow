@@ -58,7 +58,7 @@ When the orchestrator returns `result: awaiting-gate` (gate type: spec):
 **Present to human:**
 ```
 Spec ready for review → .kl/specs/TICKET-ID-Slug/
-  spec.md, plan.md, tasks.md (and research.md if created)
+  spec.md, plan.md, test-cases.md, tasks.md (and research.md if created)
 
 Top risks:
 <from orchestrator result>

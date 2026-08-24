@@ -7,6 +7,7 @@ A lightweight, zero-dependency CLI tool to sync centralized Claude Code workflow
 ## 🌟 Features
 
 * **Centralized Configuration:** Keep all your shared AI agents, prompt commands, and skill files in one central repository.
+* **Spec Artifact Templates:** Ships spec, research, plan, task, and test-case templates so target projects get the full workflow contract.
 * **Conflict Prevention:** Scans your project first and lists any existing files before prompting for overwrite permission.
 * **Zero External Dependencies:** Built using native Node.js APIs (`fs`, `path`, `readline`).
 * **Cross-Platform:** Works seamlessly across Linux, macOS, and Windows.
@@ -21,15 +22,17 @@ A lightweight, zero-dependency CLI tool to sync centralized Claude Code workflow
 
 ## 📁 Folder Structure Mapping
 
-Running `kl-wfl-cli` syncs top-level folders from the `WFL` repository into the target project's `.claude/` folder:
+Running `kl-wfl-cli` syncs top-level workflow folders from this repository into the target project's `.claude/` folder and seeds `.kl/config.json` when needed:
 
 ```text
 WFL Repository                     Target Project
-├── agents/            ────────►   └── .claude/
-├── commands/          ────────►       ├── agents/
-└── skills/            ────────►       ├── commands/
-                                       └── skills/
+├── agents/            ────────►   .claude/agents/
+├── commands/          ────────►   .claude/commands/
+├── skills/            ────────►   .claude/skills/
+└── templates/config.json ─────►   .kl/config.json
 ```
+
+The copied `skills/` tree includes nested templates such as `skills/kl-ticket-spec/templates/test-cases-template.md`, so the target project has everything needed to generate `test-cases.md` during the spec phase.
 
 ---
 

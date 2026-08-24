@@ -28,8 +28,8 @@ How each risk from `spec.md` is mitigated by this plan.
 
 ## Test Strategy
 
-Which test layers are needed (unit / functional / full suite) and the key scenarios per acceptance criterion.
+Which test layers are needed (unit / functional / full suite) and the key scenarios per acceptance criterion. Keep detailed executable scenarios in `test-cases.md`; this section explains why each layer is needed.
 
-| AC | Test Layer | Scenario |
-|---|---|---|
-| AC-1 | Unit / Functional | what is being verified |
+| AC | Test Case IDs | Test Layer | Rationale |
+|---|---|---|---|
+| AC-1 | TC-1.1, TC-1.2 | Unit / Functional | why this layer verifies the behaviour |

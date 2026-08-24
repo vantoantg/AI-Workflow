@@ -32,6 +32,7 @@ Never ask the human for input. If you hit a blocker that requires human judgment
      spec.md
      research.md   # conditional; only when real uncertainties exist
      plan.md
+     test-cases.md
      tasks.md
    ```
 2. Initialize the state file. Set `specValidation.passed` from the outcome of the skill's self-validation step (Step 5 in `kl-ticket-spec`). If validation completed cleanly, `passed: true`. If it finished after max iterations with open items, list them in `failedChecks`:
@@ -44,6 +45,7 @@ Never ask the human for input. If you hit a blocker that requires human judgment
        "spec": ".kl/specs/TICKET-ID-Slug/spec.md",
        "research": ".kl/specs/TICKET-ID-Slug/research.md",
        "plan": ".kl/specs/TICKET-ID-Slug/plan.md",
+       "testCases": ".kl/specs/TICKET-ID-Slug/test-cases.md",
        "tasks": ".kl/specs/TICKET-ID-Slug/tasks.md"
      },
      "branch": null,
@@ -78,6 +80,7 @@ Never ask the human for input. If you hit a blocker that requires human judgment
        "spec": ".kl/specs/TICKET-ID-Slug/spec.md",
        "research": ".kl/specs/TICKET-ID-Slug/research.md",
        "plan": ".kl/specs/TICKET-ID-Slug/plan.md",
+       "testCases": ".kl/specs/TICKET-ID-Slug/test-cases.md",
        "tasks": ".kl/specs/TICKET-ID-Slug/tasks.md"
      },
      "stateFile": ".kl/workflow/TICKET-ID.json",
@@ -101,7 +104,8 @@ Before writing any code, verify the spec is implementation-ready:
 1. Read `spec.md` and `research.md` if present. Scan for any unresolved `[NEEDS CLARIFICATION]` option tables — comment blocks that still contain an A/B/C table without a selected answer.
 2. Check `specValidation.passed` in the state file.
 3. Confirm `plan.md` exists and identifies affected files/modules, risk controls, and test strategy.
-4. Confirm `tasks.md` exists and contains ordered, AC-linked, test-first tasks.
+4. Confirm `test-cases.md` exists and maps every AC to required test cases with target files, concrete assertions, and verification commands.
+5. Confirm `tasks.md` exists and contains ordered, AC-linked and TC-linked test-first tasks.
 
 If unresolved clarifications are found or required artifacts are missing/incomplete → return `result: "awaiting-gate"` with `gateType: "spec-quality"`, listing each unresolved item or missing requirement. Do not proceed to Step 1 until the main session relays the human's answers.
 
@@ -114,7 +118,7 @@ If both checks pass → proceed to Step 1.
 ---
 
 ### Step 1 — High-risk check
-Read `spec.md`, `research.md` if present, `plan.md`, and `tasks.md`. Check whether implementation touches any high-risk area:
+Read `spec.md`, `research.md` if present, `plan.md`, `test-cases.md`, and `tasks.md`. Check whether implementation touches any high-risk area:
 ```
 Extra model / ExtraDataProvider interface / calculateTax / applyTaxClassDefaults
 ResponseCache / DynamoDB persistence / OpenAPI spec / provider mappings
@@ -126,14 +130,14 @@ If yes → return `result: "awaiting-gate"` with `gateType: "high-risk"` and det
 If `humanApprovals.highRisk` is already `true` in the state file → proceed.
 
 ### Step 2 — Implement
-Use the `kl-implement-spec` skill with `tasks.md` as the primary implementation checklist. Read `spec.md`, `research.md` if present, and `plan.md` for context. Follow TDD. Update `retryCount.implementation` in the state file on each retry. If retry cap (3) is hit → return `result: "blocked"` with the blocker format.
+Use the `kl-implement-spec` skill with `tasks.md` as the primary implementation checklist and `test-cases.md` as the test contract. Read `spec.md`, `research.md` if present, and `plan.md` for context. Follow TDD. Update `retryCount.implementation` in the state file on each retry. If retry cap (3) is hit → return `result: "blocked"` with the blocker format.
 
-After completing each checklist item, update `tasks.md` immediately: change `- [ ]` to `- [x]` for that item only after tests/code pass.
+After completing each checklist item, update `tasks.md` immediately: change `- [ ]` to `- [x]` for that item only after tests/code pass. When a test case's verification command passes, update its `Status` in `test-cases.md` to `Passed`.
 
 Update state file to `status: "implementation-complete"` when done.
 
 ### Step 3 — Verify
-Use the `kl-verify` skill. Record all commands and results in `testsRun` in the state file. Update `status: "verification-complete"`.
+Use the `kl-verify` skill. Base targeted verification on `test-cases.md`, record all commands and results in `testsRun` in the state file, and mark test cases `Passed` only when their verification command passed. Update `status: "verification-complete"`.
 
 ### Step 4 — Self-review
 Spawn all three reviewer agents:
@@ -146,7 +150,7 @@ For each blocking finding: fix, increment `retryCount.selfReview`, re-run the re
 Update state file to `status: "ai-review-complete"`.
 
 ### Step 5 — Return for human diff gate
-Before returning, verify every required item in `tasks.md` shows `[x]`. If any remain `[ ]`, either complete them or document why they were skipped.
+Before returning, verify every required item in `tasks.md` shows `[x]` and every required test case in `test-cases.md` is `Passed` or `Skipped` with a reason. If any remain incomplete, either complete them or document why they were skipped.
 
 Return `result: "awaiting-gate"` with:
 - `gateType: "diff"`
@@ -164,7 +168,7 @@ Return `result: "awaiting-gate"` with:
 **What to do:**
 
 ### Step 1 — Verify
-Use the `kl-verify` skill. Select and run the appropriate tests based on changed files (`git diff develop...HEAD --name-only`). Record all results in `testsRun` in the state file.
+Use the `kl-verify` skill. If `.kl/specs/TICKET-ID-Slug/test-cases.md` exists, run verification from those test cases first and mark passed cases. Then select any additional tests based on changed files (`git diff develop...HEAD --name-only`). Record all results in `testsRun` in the state file.
 
 If tests fail → apply retry cap logic (max 3 retries). On cap hit → return `result: "blocked"`.
 
@@ -194,7 +198,7 @@ Return `result: "awaiting-gate"` with:
 
 **What to do:**
 1. Confirm `humanApprovals.diff: true` is in the state file. If not → return `result: "blocked"`, reason: "diff not yet approved".
-2. Use `kl-pr-body` skill → write `.kl/.pr/TICKET-ID.md`.
+2. Use `kl-pr-body` skill → write `.kl/pr/TICKET-ID.md`.
 3. Stage and commit:
    ```bash
    git add <specific changed files — never git add -A blindly>
@@ -209,7 +213,7 @@ Return `result: "awaiting-gate"` with:
    gh pr create --draft \
      --base develop \
      --title "TICKET-ID: <ticket summary>" \
-     --body-file .kl/.pr/TICKET-ID.md
+     --body-file .kl/pr/TICKET-ID.md
    ```
 6. Update state file: `status: "draft-pr-created"`.
 7. Return `result: "success"` with the PR URL.

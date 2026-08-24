@@ -7,7 +7,7 @@ argument-hint: "MNOPVS-1234 [optional: additional context about the task]"
 # KL Ticket Spec
 
 ## Overview
-Given a Jira ticket ID, produce a structured artifact folder at `.kl/specs/TICKET-ID-Slug/` — `spec.md` (analysis, codebase context, risks), `research.md` (conditional), `plan.md` (solution approach, test strategy), and `tasks.md` (implementation checklist) — ready for human review and then execution with `/kl-implement-spec`.
+Given a Jira ticket ID, produce a structured artifact folder at `.kl/specs/TICKET-ID-Slug/` — `spec.md` (analysis, codebase context, risks), `research.md` (conditional), `plan.md` (solution approach, test strategy), `test-cases.md` (AC-linked executable test design), and `tasks.md` (implementation checklist) — ready for human review and then execution with `/kl-implement-spec`.
 
 ## Process
 
@@ -80,7 +80,8 @@ Create the folder if it does not exist. Write these files, using the templates i
 | `spec.md` | `templates/spec-template.md` | Always |
 | `research.md` | `templates/research-template.md` | Conditional — only when real uncertainties exist that need deeper investigation beyond the ticket + codebase context |
 | `plan.md` | `templates/plan-template.md` | Always |
-| `tasks.md` | `templates/tasks-template.md` | Always — derive tasks from `plan.md`'s Solution Approach and Test Strategy |
+| `test-cases.md` | `templates/test-cases-template.md` | Always — derive concrete positive, negative, edge, and failure-mode tests from every AC and high-risk area |
+| `tasks.md` | `templates/tasks-template.md` | Always — derive tasks from `plan.md`'s Solution Approach and `test-cases.md`; every test task must reference a TC-N.N ID |
 
 ---
 
@@ -93,7 +94,10 @@ Before surfacing the artifacts to the human, validate against this checklist. Fi
 | Acceptance criteria in BDD format | Every AC from the Jira ticket is a Given/When/Then scenario with an AC-N label — no bare bullet points |
 | All risks answered | All 7 risk checklist items addressed (not skipped) |
 | Plan is WHAT/WHY | `plan.md` Solution Approach has no TypeScript implementation details or specific function signatures |
+| Test cases are traceable | `test-cases.md` maps every AC to at least one required test case with target file, concrete assertions, and verification command |
+| High-risk test coverage | High-risk ACs include negative, edge, or failure-mode test cases, or a documented reason why not |
 | Tasks are testable | Every item in `tasks.md` is specific — no vague tasks like "update tests" |
+| Tasks reference test cases | Test and verification tasks reference TC-N.N IDs from `test-cases.md` |
 | Assumptions documented | Any uncertainty converted to an assumption in `spec.md`, not left as an open question |
 | Clarifications ≤ 3 | At most 3 items, each with an A/B/C option table |
 | No placeholder text | No unfilled template fields remain across any artifact |
@@ -115,6 +119,7 @@ Write `.kl/current.json` so downstream commands can locate this ticket without r
     "spec": ".kl/specs/TICKET-ID-Slug/spec.md",
     "research": ".kl/specs/TICKET-ID-Slug/research.md",
     "plan": ".kl/specs/TICKET-ID-Slug/plan.md",
+    "testCases": ".kl/specs/TICKET-ID-Slug/test-cases.md",
     "tasks": ".kl/specs/TICKET-ID-Slug/tasks.md"
   }
 }
@@ -132,6 +137,7 @@ Spec written → .kl/specs/TICKET-ID-Slug/
   spec.md
   research.md   (if created)
   plan.md
+  test-cases.md
   tasks.md
 ```
 
