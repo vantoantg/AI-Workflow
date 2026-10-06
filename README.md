@@ -94,7 +94,7 @@ To test and modify the CLI locally on your machine:
 
 1. Clone the `WFL` repository:
    ```bash
-   git clone https://github.com/your-username/WFL.git
+   git clone https://github.com/vantoantg/AI-Workflow.git
    cd WFL
    ```
 
