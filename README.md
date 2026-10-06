@@ -1,9 +1,8 @@
 # ai-wfl-cli
 
-**Author:** Toan Nguyen
-**Application Name:** AI Workflow CLI
+_AI Workflow CLI_ — a lightweight, zero-dependency CLI tool to sync centralized Claude Code workflows, agents, commands, and skills into your project's `.claude` directory.
 
-A lightweight, zero-dependency CLI tool to sync centralized Claude Code workflows, agents, commands, and skills into your project's `.claude` directory.
+Created by **Toan Nguyen**.
 
 ---
 
@@ -120,10 +119,4 @@ To test and modify the CLI locally on your machine:
 ## 📄 License
 
 [MIT](LICENSE)
-
----
-
-## 👨‍💻 Author
-
-Toan Nguyen - [GitHub](https://github.com/vantoantg)
 
