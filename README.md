@@ -1,4 +1,4 @@
-# kl-wfl-cli
+# ai-wfl-cli
 
 A lightweight, zero-dependency CLI tool to sync centralized Claude Code workflows, agents, commands, and skills into your project's `.claude` directory.
 
@@ -22,23 +22,23 @@ A lightweight, zero-dependency CLI tool to sync centralized Claude Code workflow
 
 ## 📁 Folder Structure Mapping
 
-Running `kl-wfl-cli` syncs top-level workflow folders from this repository into the target project's `.claude/` folder and seeds `.kl/config.json` when needed:
+Running `ai-wfl-cli` syncs top-level workflow folders from this repository into the target project's `.claude/` folder and seeds `.ai/config.json` when needed:
 
 ```text
 WFL Repository                     Target Project
 ├── agents/            ────────►   .claude/agents/
 ├── commands/          ────────►   .claude/commands/
 ├── skills/            ────────►   .claude/skills/
-└── templates/config.json ─────►   .kl/config.json
+└── templates/config.json ─────►   .ai/config.json
 ```
 
-The copied `skills/` tree includes nested templates such as `skills/kl-ticket-spec/templates/test-cases-template.md`, so the target project has everything needed to generate `test-cases.md` during the spec phase.
+The copied `skills/` tree includes nested templates such as `skills/ai-ticket-spec/templates/test-cases-template.md`, so the target project has everything needed to generate `test-cases.md` during the spec phase.
 
 ---
 
 ## 🚀 Usage
 
-You can use `kl-wfl-cli` in any project directory using any of the following methods:
+You can use `ai-wfl-cli` in any project directory using any of the following methods:
 
 ### Method 1: Execute via `npx` (Recommended)
 
@@ -46,7 +46,7 @@ Run directly without installing globally:
 
 ```bash
 # If published on NPM
-npx kl-wfl-cli
+npx ai-wfl-cli
 
 # Or run directly from GitHub
 npx github:your-username/WFL
@@ -59,7 +59,7 @@ npx github:your-username/WFL
 If you have installed the package globally or linked it locally:
 
 ```bash
-kl-wfl
+ai-wfl
 ```
 
 ---
@@ -103,7 +103,7 @@ To test and modify the CLI locally on your machine:
 
 3. Navigate to any test project and run:
    ```bash
-   kl-wfl
+   ai-wfl
    ```
 
 4. To unlink when done:

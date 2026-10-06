@@ -1,27 +1,27 @@
 ---
-name: kl-implement-spec
-description: Use when the user wants to implement a Jira ticket that already has an approved spec artifact folder in .kl/specs/. Reads spec.md/plan.md/test-cases.md/tasks.md, follows the implementation checklist in tasks.md, applies TDD from test-cases.md, tracks retry attempts, and updates the workflow state file as it goes.
-argument-hint: "MNOPVS-1234"
+name: ai-implement-spec
+description: Use when the user wants to implement a Jira ticket that already has an approved spec artifact folder in .ai/specs/. Reads spec.md/plan.md/test-cases.md/tasks.md, follows the implementation checklist in tasks.md, applies TDD from test-cases.md, tracks retry attempts, and updates the workflow state file as it goes.
+argument-hint: "JIRA-ID-1234"
 ---
 
 # KL Implement Spec
 
 ## Overview
-Read the `.kl/specs/TICKET-ID-Slug/` artifact folder produced and approved via `kl-ticket-spec`, then execute the implementation end-to-end: source changes, tests first (TDD) from `test-cases.md`, lint, coverage check, and state file updates at every phase boundary.
+Read the `.ai/specs/TICKET-ID-Slug/` artifact folder produced and approved via `ai-ticket-spec`, then execute the implementation end-to-end: source changes, tests first (TDD) from `test-cases.md`, lint, coverage check, and state file updates at every phase boundary.
 
 ## Process
 
 ### Step 1 — Locate the spec folder
-Given a ticket ID (e.g. `MNOPVS-1234`), find the matching spec folder:
+Given a ticket ID (e.g. `JIRA-ID-1234`), find the matching spec folder:
 
 ```bash
-find .kl/specs -type d -name "MNOPVS-1234-*" | head -1
+find .ai/specs -type d -name "JIRA-ID-1234-*" | head -1
 ```
 
-Read `spec.md`, `research.md` (if present), `plan.md`, `test-cases.md`, and `tasks.md` in full. If no spec folder exists, stop and tell the user to run `/kl-ticket-spec TICKET-ID` first. If `test-cases.md` is missing, stop and ask the user to regenerate or update the spec artifacts before implementation.
+Read `spec.md`, `research.md` (if present), `plan.md`, `test-cases.md`, and `tasks.md` in full. If no spec folder exists, stop and tell the user to run `/ai-ticket-spec TICKET-ID` first. If `test-cases.md` is missing, stop and ask the user to regenerate or update the spec artifacts before implementation.
 
 ### Step 2 — Load the workflow state file
-Read `.kl/workflow/TICKET-ID.json`. It tells you:
+Read `.ai/workflow/TICKET-ID.json`. It tells you:
 - Which phases are already complete
 - Human approvals already granted
 - Current `retryCount.implementation` value
@@ -33,12 +33,12 @@ If the state file does not exist, create it now:
 {
   "ticket": "TICKET-ID",
   "status": "implementation-in-progress",
-  "specDir": ".kl/specs/TICKET-ID-Slug",
+  "specDir": ".ai/specs/TICKET-ID-Slug",
   "artifacts": {
-    "spec": ".kl/specs/TICKET-ID-Slug/spec.md",
-    "plan": ".kl/specs/TICKET-ID-Slug/plan.md",
-    "testCases": ".kl/specs/TICKET-ID-Slug/test-cases.md",
-    "tasks": ".kl/specs/TICKET-ID-Slug/tasks.md"
+    "spec": ".ai/specs/TICKET-ID-Slug/spec.md",
+    "plan": ".ai/specs/TICKET-ID-Slug/plan.md",
+    "testCases": ".ai/specs/TICKET-ID-Slug/test-cases.md",
+    "tasks": ".ai/specs/TICKET-ID-Slug/tasks.md"
   },
   "branch": "<current branch>",
   "humanApprovals": { "spec": true, "highRisk": false, "diff": false },
@@ -175,5 +175,5 @@ Reply with `continue: <guidance>` or `stop workflow`.
 ```
 
 ## Related Skills
-- **REQUIRED PREDECESSOR:** `kl-ticket-spec` — run this first to produce and approve the spec file
+- **REQUIRED PREDECESSOR:** `ai-ticket-spec` — run this first to produce and approve the spec file
 - **REQUIRED APPROACH:** `superpowers:test-driven-development` — follow TDD strictly; this project's 100% threshold enforces it

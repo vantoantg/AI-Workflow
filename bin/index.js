@@ -7,7 +7,7 @@ const { stdin: input, stdout: output } = require('process');
 
 const packageRootDir = path.resolve(__dirname, '..');
 const targetClaudeDir = path.resolve(process.cwd(), '.claude');
-const targetKlDir = path.resolve(process.cwd(), '.kl');
+const targetKlDir = path.resolve(process.cwd(), '.ai');
 const foldersToSync = ['agents', 'commands', 'skills'];
 const configTemplatePath = path.join(packageRootDir, 'templates', 'config.json');
 const targetConfigPath = path.join(targetKlDir, 'config.json');
@@ -88,14 +88,14 @@ async function main() {
         process.exit(1);
     }
 
-    // 4. Seed .kl/config.json from template if it doesn't exist yet
+    // 4. Seed .ai/config.json from template if it doesn't exist yet
     let pkbProjectId = '';
     if (!fs.existsSync(targetConfigPath)) {
         if (!fs.existsSync(targetKlDir)) {
             fs.mkdirSync(targetKlDir, { recursive: true });
         }
         fs.cpSync(configTemplatePath, targetConfigPath);
-        console.log('  ✔ Created: .kl/config.json');
+        console.log('  ✔ Created: .ai/config.json');
     } else {
         try {
             pkbProjectId = JSON.parse(fs.readFileSync(targetConfigPath, 'utf8')).pkbProjectId || '';
@@ -105,7 +105,7 @@ async function main() {
     }
 
     if (!pkbProjectId) {
-        console.log('\n⚠️  .kl/config.json has no "pkbProjectId" set.');
+        console.log('\n⚠️  .ai/config.json has no "pkbProjectId" set.');
         console.log('   Set it to this repo\'s PKB project_id (e.g. "NOP") so PKB MCP searches are scoped correctly.');
     }
 }

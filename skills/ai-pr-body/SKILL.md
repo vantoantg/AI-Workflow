@@ -1,28 +1,28 @@
 ---
-name: kl-pr-body
+name: ai-pr-body
 description: Use when preparing a pull request body for a Jira-tracked ticket in this repository. Generates a standardized PR description from the workflow spec and state file.
-argument-hint: "MNOPVS-1234"
+argument-hint: "JIRA-ID-1234"
 ---
 
 # KL PR Description
 
 ## Overview
-Generate a standardized pull request body file at `.kl/pr/TICKET-ID.md` from the approved spec and workflow state. Called as part of `/kl-dev-ticket` Phase 7 or `/kl-pr-ready`.
+Generate a standardized pull request body file at `.ai/pr/TICKET-ID.md` from the approved spec and workflow state. Called as part of `/ai-dev-ticket` Phase 7 or `/ai-pr-ready`.
 
 ## Process
 
 ### Step 1 — Read source artifacts
 
 Read all of:
-- `.kl/specs/TICKET-ID-Slug/spec.md` — acceptance criteria, risks
-- `.kl/specs/TICKET-ID-Slug/plan.md` — solution approach
-- `.kl/specs/TICKET-ID-Slug/test-cases.md` — planned, passed, and skipped test cases
-- `.kl/workflow/TICKET-ID.json` — tests run, retry events, approval state
+- `.ai/specs/TICKET-ID-Slug/spec.md` — acceptance criteria, risks
+- `.ai/specs/TICKET-ID-Slug/plan.md` — solution approach
+- `.ai/specs/TICKET-ID-Slug/test-cases.md` — planned, passed, and skipped test cases
+- `.ai/workflow/TICKET-ID.json` — tests run, retry events, approval state
 - `git diff develop...HEAD` — summarize actual changes
 
-### Step 2 — Write `.kl/pr/TICKET-ID.md`
+### Step 2 — Write `.ai/pr/TICKET-ID.md`
 
-Create `.kl/pr/` if it does not exist.
+Create `.ai/pr/` if it does not exist.
 
 Use the template below. Fill every section from the source artifacts — do not leave placeholder text.
 
@@ -87,7 +87,7 @@ Implements [TICKET-ID](https://keyloop.atlassian.net/browse/TICKET-ID).
 
 After writing the file:
 ```
-PR body written → .kl/pr/TICKET-ID.md
+PR body written → .ai/pr/TICKET-ID.md
 ```
 
 The file is ready for human review before the PR is created.

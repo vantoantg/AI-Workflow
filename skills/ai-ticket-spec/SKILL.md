@@ -1,18 +1,18 @@
 ---
-name: kl-ticket-spec
-description: Use when the user provides a Jira ticket ID (e.g. MNOPVS-1234) to analyze before implementation. Fetch, analyze, align with codebase, surface risks, and write a .kl/specs/TICKET-ID-Slug/ artifact folder ready for human review.
-argument-hint: "MNOPVS-1234 [optional: additional context about the task]"
+name: ai-ticket-spec
+description: Use when the user provides a Jira ticket ID (e.g. JIRA-ID-1234) to analyze before implementation. Fetch, analyze, align with codebase, surface risks, and write a .ai/specs/TICKET-ID-Slug/ artifact folder ready for human review.
+argument-hint: "JIRA-ID-1234 [optional: additional context about the task]"
 ---
 
 # KL Ticket Spec
 
 ## Overview
-Given a Jira ticket ID, produce a structured artifact folder at `.kl/specs/TICKET-ID-Slug/` — `spec.md` (analysis, codebase context, risks), `research.md` (conditional), `plan.md` (solution approach, test strategy), `test-cases.md` (AC-linked executable test design), and `tasks.md` (implementation checklist) — ready for human review and then execution with `/kl-implement-spec`.
+Given a Jira ticket ID, produce a structured artifact folder at `.ai/specs/TICKET-ID-Slug/` — `spec.md` (analysis, codebase context, risks), `research.md` (conditional), `plan.md` (solution approach, test strategy), `test-cases.md` (AC-linked executable test design), and `tasks.md` (implementation checklist) — ready for human review and then execution with `/ai-implement-spec`.
 
 ## Process
 
 ### Step 0 — Resolve ticket ID
-Scan `$ARGUMENTS` for a pattern matching `[A-Z]+-[0-9]+` (e.g. `MNOPVS-1234`). If found, use it. If not found, check `.kl/current.json` for an active ticket. If still not found, ask the user to provide the ticket ID.
+Scan `$ARGUMENTS` for a pattern matching `[A-Z]+-[0-9]+` (e.g. `JIRA-ID-1234`). If found, use it. If not found, check `.ai/current.json` for an active ticket. If still not found, ask the user to provide the ticket ID.
 
 ### Step 1 — Fetch the ticket
 Use `mcp__atlassian__getJiraIssue` with the ticket ID.
@@ -24,9 +24,9 @@ Extract:
 
 ### Step 2 — Explore the codebase
 
-**Step 2a — Resolve PKB project config.** Check `.kl/config.json` for a `pkbProjectId` field.
+**Step 2a — Resolve PKB project config.** Check `.ai/config.json` for a `pkbProjectId` field.
 - If present, use it as the `project_id` filter for PKB MCP calls below.
-- If `.kl/config.json` does not exist or lacks `pkbProjectId`, ask the user once: "What PKB project_id should this repo use for PKB MCP searches (e.g. NOP)?" Then create `.kl/config.json`:
+- If `.ai/config.json` does not exist or lacks `pkbProjectId`, ask the user once: "What PKB project_id should this repo use for PKB MCP searches (e.g. NOP)?" Then create `.ai/config.json`:
   ```json
   {
     "pkbProjectId": "NOP"
@@ -69,9 +69,9 @@ For every affected area ask:
 
 ### Step 4 — Write the spec artifacts
 
-**Folder:** `.kl/specs/TICKET-ID-Slug/`
+**Folder:** `.ai/specs/TICKET-ID-Slug/`
 - Slug: lowercase hyphenated summary derived from the ticket title (max ~6 words)
-- Example: `.kl/specs/MNOPVS-1234-add-tax-class-for-extras/`
+- Example: `.ai/specs/JIRA-ID-1234-add-tax-class-for-extras/`
 
 Create the folder if it does not exist. Write these files, using the templates in `templates/` (relative to this skill file). Fill every section — do not leave placeholder text.
 
@@ -109,18 +109,18 @@ If a check fails → fix the relevant artifact → re-run. After 3 failed iterat
 
 ### Step 6 — Write pointer file
 
-Write `.kl/current.json` so downstream commands can locate this ticket without requiring the user to re-enter it:
+Write `.ai/current.json` so downstream commands can locate this ticket without requiring the user to re-enter it:
 
 ```json
 {
   "ticket": "TICKET-ID",
-  "specDir": ".kl/specs/TICKET-ID-Slug",
+  "specDir": ".ai/specs/TICKET-ID-Slug",
   "artifacts": {
-    "spec": ".kl/specs/TICKET-ID-Slug/spec.md",
-    "research": ".kl/specs/TICKET-ID-Slug/research.md",
-    "plan": ".kl/specs/TICKET-ID-Slug/plan.md",
-    "testCases": ".kl/specs/TICKET-ID-Slug/test-cases.md",
-    "tasks": ".kl/specs/TICKET-ID-Slug/tasks.md"
+    "spec": ".ai/specs/TICKET-ID-Slug/spec.md",
+    "research": ".ai/specs/TICKET-ID-Slug/research.md",
+    "plan": ".ai/specs/TICKET-ID-Slug/plan.md",
+    "testCases": ".ai/specs/TICKET-ID-Slug/test-cases.md",
+    "tasks": ".ai/specs/TICKET-ID-Slug/tasks.md"
   }
 }
 ```
@@ -133,7 +133,7 @@ Omit `artifacts.research` if `research.md` was not created.
 
 After writing the artifacts, confirm with:
 ```
-Spec written → .kl/specs/TICKET-ID-Slug/
+Spec written → .ai/specs/TICKET-ID-Slug/
   spec.md
   research.md   (if created)
   plan.md
@@ -145,4 +145,4 @@ Then briefly summarise:
 - The top 1–2 risks found
 - Any clarifications that should be resolved before the human approves the spec
 
-**Stop here.** Wait for the human to review and approve the spec before proceeding to `/kl-implement-spec`.
+**Stop here.** Wait for the human to review and approve the spec before proceeding to `/ai-implement-spec`.

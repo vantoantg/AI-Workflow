@@ -1,7 +1,7 @@
 ---
-name: kl-verify
+name: ai-verify
 description: Use when deciding which tests to run after an implementation change, or when recording verification results into the workflow state file. Covers unit, functional, full suite, and docs checks.
-argument-hint: "MNOPVS-1234 [optional: unit|functional|full]"
+argument-hint: "JIRA-ID-1234 [optional: unit|functional|full]"
 ---
 
 # KL Test Verification
@@ -11,12 +11,12 @@ Standardize how the AI selects, runs, and records verification commands in this 
 
 ## Test Case Driven Verification
 
-Before choosing commands, read `.kl/specs/TICKET-ID-Slug/test-cases.md` when it exists.
+Before choosing commands, read `.ai/specs/TICKET-ID-Slug/test-cases.md` when it exists.
 
 For every required test case:
 1. Confirm the target test file exists or was created during implementation.
 2. Run the listed `Verification Command`, or the closest project-correct equivalent if the command is stale.
-3. Record the command result in `.kl/workflow/TICKET-ID.json`.
+3. Record the command result in `.ai/workflow/TICKET-ID.json`.
 4. Mark the test case `Passed` in `test-cases.md` only if the command passed and the test case is covered by that command.
 5. If a required test case cannot be run, leave it as `Planned` or mark it `Skipped` only with a reason.
 
@@ -63,7 +63,7 @@ npm run spectral-lint  # Validate against NetDirector standards
 
 ## Recording Results
 
-After every command, record an entry in `.kl/workflow/TICKET-ID.json`:
+After every command, record an entry in `.ai/workflow/TICKET-ID.json`:
 
 ```json
 {

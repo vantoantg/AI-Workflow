@@ -1,10 +1,10 @@
 {
-  "name": "kl-wfl-cli",
+  "name": "ai-wfl-cli",
   "version": "1.0.0",
   "description": "CLI sync WFL agents, commands, and skills to .claude directory",
   "main": "bin/index.js",
   "bin": {
-    "kl-wfl": "bin/index.js"
+    "ai-wfl": "bin/index.js"
   },
   "files": [
     "bin",

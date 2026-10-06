@@ -2,7 +2,7 @@
 
 ## Purpose
 
-`kl-workflow` is a reusable framework for AI-assisted development workflows. It packages Claude Code commands, agents, skills, and starter `.kl` configuration so other repositories can adopt a consistent ticket-to-draft-PR process.
+`ai-workflow` is a reusable framework for AI-assisted development workflows. It packages Claude Code commands, agents, skills, and starter `.ai` configuration so other repositories can adopt a consistent ticket-to-draft-PR process.
 
 The framework is intentionally **human-in-the-loop**. AI can perform analysis, implementation, verification, review, and draft PR preparation, but humans approve intent, risk, final diffs, PR review, merge, and deployment.
 
@@ -11,33 +11,33 @@ The framework is intentionally **human-in-the-loop**. AI can perform analysis, i
 This repository is both the source of truth for the workflow assets and the distributable CLI package that installs those assets into target projects.
 
 ```text
-kl-workflow/
+ai-workflow/
 ├── README.md
 ├── Workflow-design.md
 ├── package.json
 ├── bin/
 │   └── index.js
 ├── agents/
-│   ├── kl-orchestrator.md
-│   ├── kl-senior-code-reviewer.md
-│   ├── kl-test-reviewer.md
-│   └── kl-typescript-reviewer.md
+│   ├── ai-orchestrator.md
+│   ├── ai-senior-code-reviewer.md
+│   ├── ai-test-reviewer.md
+│   └── ai-typescript-reviewer.md
 ├── commands/
-│   ├── kl-dev-ticket.md
-│   └── kl-pr-ready.md
+│   ├── ai-dev-ticket.md
+│   └── ai-pr-ready.md
 ├── skills/
-│   ├── kl-implement-spec/
+│   ├── ai-implement-spec/
 │   │   └── SKILL.md
-│   ├── kl-pr-body/
+│   ├── ai-pr-body/
 │   │   └── SKILL.md
-│   ├── kl-ticket-spec/
+│   ├── ai-ticket-spec/
 │   │   ├── SKILL.md
 │   │   └── templates/
 │   │       ├── plan-template.md
 │   │       ├── research-template.md
 │   │       ├── spec-template.md
 │   │       └── tasks-template.md
-│   └── kl-verify/
+│   └── ai-verify/
 │       └── SKILL.md
 └── templates/
     └── config.json
@@ -48,21 +48,21 @@ The package exposes one CLI command:
 ```json
 {
   "bin": {
-    "kl-wfl": "bin/index.js"
+    "ai-wfl": "bin/index.js"
   }
 }
 ```
 
 ## Installation Model
 
-Running `kl-wfl` in a target project copies the framework assets into the target project's Claude Code folders:
+Running `ai-wfl` in a target project copies the framework assets into the target project's Claude Code folders:
 
 ```text
-kl-workflow package                  Target project
+ai-workflow package                  Target project
 ├── agents/              ───────►    .claude/agents/
 ├── commands/            ───────►    .claude/commands/
 ├── skills/              ───────►    .claude/skills/
-└── templates/config.json ──────►    .kl/config.json
+└── templates/config.json ──────►    .ai/config.json
 ```
 
 The CLI behavior is:
@@ -70,10 +70,10 @@ The CLI behavior is:
 1. Scan the target project's `.claude/agents`, `.claude/commands`, and `.claude/skills` folders for conflicts.
 2. If conflicts exist, print the conflicting paths and ask before overwriting.
 3. Copy framework assets into `.claude/`.
-4. Create `.kl/config.json` from `templates/config.json` if it does not already exist.
-5. Warn if `.kl/config.json` has no `pkbProjectId`.
+4. Create `.ai/config.json` from `templates/config.json` if it does not already exist.
+5. Warn if `.ai/config.json` has no `pkbProjectId`.
 
-Current `.kl/config.json` template:
+Current `.ai/config.json` template:
 
 ```json
 {
@@ -86,9 +86,9 @@ Current `.kl/config.json` template:
 The framework owns:
 
 - A reusable command flow for ticket intake, implementation, verification, AI review, and draft PR creation.
-- Standard artifact locations under `.kl/`.
+- Standard artifact locations under `.ai/`.
 - Human approval gates and resume state.
-- A consistent orchestration pattern where commands manage gates and `kl-orchestrator` performs autonomous phases.
+- A consistent orchestration pattern where commands manage gates and `ai-orchestrator` performs autonomous phases.
 - Baseline reviewer roles for senior engineering review, TypeScript review, and test-quality review.
 - A seed PKB project configuration file for scoped semantic search.
 
@@ -104,8 +104,8 @@ Target projects own:
 
 | Command | Role | Human-facing behavior |
 |---|---|---|
-| `/kl-dev-ticket TICKET-ID` | Full ticket-to-draft-PR workflow | Runs pre-flight, delegates spec/branch/implementation/PR phases, and stops at human gates. |
-| `/kl-pr-ready TICKET-ID` | Existing-branch PR preparation | Verifies and reviews an already implemented branch, then stops for diff approval before draft PR creation. |
+| `/ai-dev-ticket TICKET-ID` | Full ticket-to-draft-PR workflow | Runs pre-flight, delegates spec/branch/implementation/PR phases, and stops at human gates. |
+| `/ai-pr-ready TICKET-ID` | Existing-branch PR preparation | Verifies and reviews an already implemented branch, then stops for diff approval before draft PR creation. |
 
 Commands are **gate managers only**. They should not implement code directly.
 
@@ -113,25 +113,25 @@ Commands are **gate managers only**. They should not implement code directly.
 
 | Agent | Role |
 |---|---|
-| `kl-orchestrator` | Executes one autonomous phase at a time, reads and writes `.kl/workflow/TICKET-ID.json`, and returns structured results to the command/main session. |
+| `ai-orchestrator` | Executes one autonomous phase at a time, reads and writes `.ai/workflow/TICKET-ID.json`, and returns structured results to the command/main session. |
 
 Supported phases:
 
 | Phase | Triggered by | Responsibility |
 |---|---|---|
-| `spec` | `/kl-dev-ticket` | Run ticket-spec workflow and create spec artifacts. |
-| `branch` | `/kl-dev-ticket` after spec approval | Create branch and update workflow state. |
-| `impl` | `/kl-dev-ticket` after branch phase | Implement, verify, and run AI self-review. |
-| `verify-and-review` | `/kl-pr-ready` | Run verification and AI self-review for existing changes. |
+| `spec` | `/ai-dev-ticket` | Run ticket-spec workflow and create spec artifacts. |
+| `branch` | `/ai-dev-ticket` after spec approval | Create branch and update workflow state. |
+| `impl` | `/ai-dev-ticket` after branch phase | Implement, verify, and run AI self-review. |
+| `verify-and-review` | `/ai-pr-ready` | Run verification and AI self-review for existing changes. |
 | `pr` | Both commands after diff approval | Generate PR body, commit, push, and create draft PR. |
 
 ### Reviewer Agents
 
 | Agent | Focus |
 |---|---|
-| `kl-senior-code-reviewer` | Architecture, correctness, SOLID, clean code, edge cases, security, performance, and scope control. |
-| `kl-typescript-reviewer` | Type safety, strict-mode correctness, unsafe casts, generics, async typing, and idiomatic TypeScript. |
-| `kl-test-reviewer` | Test quality, meaningful assertions, realistic mocks, failure modes, isolation, and test weakening. |
+| `ai-senior-code-reviewer` | Architecture, correctness, SOLID, clean code, edge cases, security, performance, and scope control. |
+| `ai-typescript-reviewer` | Type safety, strict-mode correctness, unsafe casts, generics, async typing, and idiomatic TypeScript. |
+| `ai-test-reviewer` | Test quality, meaningful assertions, realistic mocks, failure modes, isolation, and test weakening. |
 
 These agents are spawned by the orchestrator during implementation or PR readiness checks.
 
@@ -139,10 +139,10 @@ These agents are spawned by the orchestrator during implementation or PR readine
 
 | Skill | Purpose |
 |---|---|
-| `kl-ticket-spec` | Fetch and analyze a ticket, search the codebase, and write `.kl/specs/TICKET-ID-Slug/` artifacts, including `test-cases.md`. |
-| `kl-implement-spec` | Implement an approved spec using `tasks.md` and `test-cases.md`, TDD, retry caps, and state updates. |
-| `kl-verify` | Run verification from `test-cases.md` first, then changed-file-based checks, and record results in workflow state. |
-| `kl-pr-body` | Generate `.kl/pr/TICKET-ID.md` from spec artifacts, state, and the actual diff. |
+| `ai-ticket-spec` | Fetch and analyze a ticket, search the codebase, and write `.ai/specs/TICKET-ID-Slug/` artifacts, including `test-cases.md`. |
+| `ai-implement-spec` | Implement an approved spec using `tasks.md` and `test-cases.md`, TDD, retry caps, and state updates. |
+| `ai-verify` | Run verification from `test-cases.md` first, then changed-file-based checks, and record results in workflow state. |
+| `ai-pr-body` | Generate `.ai/pr/TICKET-ID.md` from spec artifacts, state, and the actual diff. |
 
 ## Target Project Runtime Structure
 
@@ -152,21 +152,21 @@ After installation and during workflow execution, target projects use this struc
 target-project/
 ├── .claude/
 │   ├── agents/
-│   │   ├── kl-orchestrator.md
-│   │   ├── kl-senior-code-reviewer.md
-│   │   ├── kl-test-reviewer.md
-│   │   └── kl-typescript-reviewer.md
+│   │   ├── ai-orchestrator.md
+│   │   ├── ai-senior-code-reviewer.md
+│   │   ├── ai-test-reviewer.md
+│   │   └── ai-typescript-reviewer.md
 │   ├── commands/
-│   │   ├── kl-dev-ticket.md
-│   │   └── kl-pr-ready.md
+│   │   ├── ai-dev-ticket.md
+│   │   └── ai-pr-ready.md
 │   └── skills/
-│       ├── kl-implement-spec/
-│       ├── kl-pr-body/
-│       ├── kl-ticket-spec/
+│       ├── ai-implement-spec/
+│       ├── ai-pr-body/
+│       ├── ai-ticket-spec/
 │       │   └── templates/
 │       │       └── test-cases-template.md
-│       └── kl-verify/
-└── .kl/
+│       └── ai-verify/
+└── .ai/
     ├── config.json
     ├── current.json
     ├── specs/
@@ -182,14 +182,14 @@ target-project/
         └── TICKET-ID.md
 ```
 
-`.claude/` contains installed framework instructions. `.kl/` contains target-project runtime state and generated artifacts.
+`.claude/` contains installed framework instructions. `.ai/` contains target-project runtime state and generated artifacts.
 
 ## End-to-end Workflow
 
 Input:
 
 ```text
-/kl-dev-ticket ABC-1234
+/ai-dev-ticket ABC-1234
 ```
 
 Target output:
@@ -203,15 +203,15 @@ High-level flow:
 ```text
 main session: pre-flight
   │
-  ├─ kl-orchestrator: spec phase
-  │    └─ writes .kl/specs/ABC-1234-slug/
+  ├─ ai-orchestrator: spec phase
+  │    └─ writes .ai/specs/ABC-1234-slug/
   │
   ├─ GATE 1: human reviews spec
   │
-  ├─ kl-orchestrator: branch phase
-  │    └─ creates branch + updates .kl/current.json and .kl/workflow/ABC-1234.json
+  ├─ ai-orchestrator: branch phase
+  │    └─ creates branch + updates .ai/current.json and .ai/workflow/ABC-1234.json
   │
-  ├─ kl-orchestrator: impl phase
+  ├─ ai-orchestrator: impl phase
   │    ├─ validates spec readiness
   │    ├─ stops for high-risk approval when needed
   │    ├─ implements via TDD
@@ -220,8 +220,8 @@ main session: pre-flight
   │
   ├─ GATE 2: human reviews final diff
   │
-  ├─ kl-orchestrator: pr phase
-  │    ├─ writes .kl/pr/ABC-1234.md
+  ├─ ai-orchestrator: pr phase
+  │    ├─ writes .ai/pr/ABC-1234.md
   │    ├─ commits approved files
   │    ├─ pushes branch
   │    └─ creates draft PR
@@ -255,10 +255,10 @@ stop workflow
 
 ### Spec folder
 
-`kl-ticket-spec` writes:
+`ai-ticket-spec` writes:
 
 ```text
-.kl/specs/ABC-1234-ticket-slug/
+.ai/specs/ABC-1234-ticket-slug/
 ├── spec.md
 ├── research.md   # conditional
 ├── plan.md
@@ -296,7 +296,7 @@ During implementation and verification, a test case may be marked `Passed` only 
 
 ### Workflow state
 
-`.kl/workflow/TICKET-ID.json` is the source of truth for resumability, approvals, retry caps, blockers, and test results.
+`.ai/workflow/TICKET-ID.json` is the source of truth for resumability, approvals, retry caps, blockers, and test results.
 
 Recommended schema:
 
@@ -304,13 +304,13 @@ Recommended schema:
 {
   "ticket": "ABC-1234",
   "status": "spec-created",
-  "specDir": ".kl/specs/ABC-1234-ticket-slug",
+  "specDir": ".ai/specs/ABC-1234-ticket-slug",
   "artifacts": {
-    "spec": ".kl/specs/ABC-1234-ticket-slug/spec.md",
-    "research": ".kl/specs/ABC-1234-ticket-slug/research.md",
-    "plan": ".kl/specs/ABC-1234-ticket-slug/plan.md",
-    "testCases": ".kl/specs/ABC-1234-ticket-slug/test-cases.md",
-    "tasks": ".kl/specs/ABC-1234-ticket-slug/tasks.md"
+    "spec": ".ai/specs/ABC-1234-ticket-slug/spec.md",
+    "research": ".ai/specs/ABC-1234-ticket-slug/research.md",
+    "plan": ".ai/specs/ABC-1234-ticket-slug/plan.md",
+    "testCases": ".ai/specs/ABC-1234-ticket-slug/test-cases.md",
+    "tasks": ".ai/specs/ABC-1234-ticket-slug/tasks.md"
   },
   "branch": null,
   "humanApprovals": {
@@ -349,29 +349,29 @@ blocked
 
 ### Active ticket pointer
 
-`.kl/current.json` lets commands resume without the user re-entering the ticket ID:
+`.ai/current.json` lets commands resume without the user re-entering the ticket ID:
 
 ```json
 {
   "ticket": "ABC-1234",
-  "specDir": ".kl/specs/ABC-1234-ticket-slug",
+  "specDir": ".ai/specs/ABC-1234-ticket-slug",
   "artifacts": {
-    "spec": ".kl/specs/ABC-1234-ticket-slug/spec.md",
-    "plan": ".kl/specs/ABC-1234-ticket-slug/plan.md",
-    "testCases": ".kl/specs/ABC-1234-ticket-slug/test-cases.md",
-    "tasks": ".kl/specs/ABC-1234-ticket-slug/tasks.md"
+    "spec": ".ai/specs/ABC-1234-ticket-slug/spec.md",
+    "plan": ".ai/specs/ABC-1234-ticket-slug/plan.md",
+    "testCases": ".ai/specs/ABC-1234-ticket-slug/test-cases.md",
+    "tasks": ".ai/specs/ABC-1234-ticket-slug/tasks.md"
   },
-  "stateFile": ".kl/workflow/ABC-1234.json",
+  "stateFile": ".ai/workflow/ABC-1234.json",
   "branch": "feature/ABC-1234-ticket-slug"
 }
 ```
 
 ### PR body
 
-`kl-pr-body` writes:
+`ai-pr-body` writes:
 
 ```text
-.kl/pr/ABC-1234.md
+.ai/pr/ABC-1234.md
 ```
 
 The PR body should include the ticket link, summary, changes, acceptance criteria checklist, test-case summary, commands actually run, risks, and reviewer notes.
@@ -380,10 +380,10 @@ The PR body should include the ticket link, summary, changes, acceptance criteri
 
 Before any autonomous phase changes files, the main session should:
 
-1. Resolve ticket ID from the user message, then `.kl/current.json`, then human input.
+1. Resolve ticket ID from the user message, then `.ai/current.json`, then human input.
 2. Run `git status`.
 3. Run `git branch --show-current`.
-4. Check for an existing `.kl/workflow/TICKET-ID.json`.
+4. Check for an existing `.ai/workflow/TICKET-ID.json`.
 5. Resume completed phases from state instead of repeating them.
 6. Stop when the working tree contains unrelated or unsafe local changes.
 
@@ -422,7 +422,7 @@ The implementation phase should:
 
 ## Verification Rules
 
-`kl-verify` chooses verification from `test-cases.md` first, then adds changed-file-based checks from target-project conventions.
+`ai-verify` chooses verification from `test-cases.md` first, then adds changed-file-based checks from target-project conventions.
 
 The framework-level rules are:
 
@@ -495,14 +495,14 @@ When high-risk areas are detected, the orchestrator returns `awaiting-gate` with
 
 ## PR Phase Rules
 
-The orchestrator may create a draft PR only after `humanApprovals.diff` is true in `.kl/workflow/TICKET-ID.json`.
+The orchestrator may create a draft PR only after `humanApprovals.diff` is true in `.ai/workflow/TICKET-ID.json`.
 
 Before committing, it should:
 
 - Confirm the current diff matches the approved work.
 - Stage specific changed files rather than blindly staging everything.
 - Exclude secrets, local config, temporary files, debug output, and unrelated changes.
-- Generate `.kl/pr/TICKET-ID.md` using `kl-pr-body`.
+- Generate `.ai/pr/TICKET-ID.md` using `ai-pr-body`.
 - Use the target project's configured base branch.
 
 Default command shape:
@@ -514,7 +514,7 @@ git push -u origin <branch>
 gh pr create --draft \
   --base <target-base-branch> \
   --title "ABC-1234: ticket summary" \
-  --body-file .kl/pr/ABC-1234.md
+  --body-file .ai/pr/ABC-1234.md
 ```
 
 ## Customization Guidelines for Target Projects
@@ -525,15 +525,15 @@ Recommended customization points:
 
 | Area | Where to customize |
 |---|---|
-| PKB project ID | `.kl/config.json` |
+| PKB project ID | `.ai/config.json` |
 | Issue key examples | Command/skill examples if not Jira-style `ABC-1234` |
-| Ticket provider | `kl-ticket-spec` skill |
-| Repository paths | `kl-ticket-spec`, `kl-implement-spec`, reviewer agents |
-| Test/build/lint commands | `kl-verify`, `kl-implement-spec`, reviewer agents |
-| Test-case template | `skills/kl-ticket-spec/templates/test-cases-template.md` |
-| High-risk domain list | `kl-orchestrator`, `kl-implement-spec`, reviewer agents |
-| PR base branch | `kl-orchestrator`, `kl-pr-body` |
-| PR template expectations | `kl-pr-body` |
+| Ticket provider | `ai-ticket-spec` skill |
+| Repository paths | `ai-ticket-spec`, `ai-implement-spec`, reviewer agents |
+| Test/build/lint commands | `ai-verify`, `ai-implement-spec`, reviewer agents |
+| Test-case template | `skills/ai-ticket-spec/templates/test-cases-template.md` |
+| High-risk domain list | `ai-orchestrator`, `ai-implement-spec`, reviewer agents |
+| PR base branch | `ai-orchestrator`, `ai-pr-body` |
+| PR template expectations | `ai-pr-body` |
 | Review standards | Reviewer agents and project `CLAUDE.md` |
 
 Project-specific guidance should live in the installed assets or in the target project's own `CLAUDE.md`. The framework design should remain generic enough to support multiple repositories.
@@ -553,8 +553,8 @@ When changing this repository:
 
 The framework is successful when a target project can:
 
-- Install the workflow with `kl-wfl`.
-- Configure `.kl/config.json`.
+- Install the workflow with `ai-wfl`.
+- Configure `.ai/config.json`.
 - Start from a ticket ID.
 - Produce human-reviewable spec artifacts.
 - Resume workflow state across sessions.
